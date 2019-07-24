@@ -15,6 +15,7 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
         </File>
         <!-- 这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <!--${sys:user.home}等价于System.getProperty("user.home")-->
         <RollingFile name="RollingFileInfo" fileName="${sys:user.home}/logs/info.log"
                      filePattern="${sys:user.home}/logs/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log">
             <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
@@ -51,11 +52,14 @@
         <!--过滤掉spring和mybatis的一些无用的DEBUG信息-->
         <logger name="org.springframework" level="INFO"></logger>
         <logger name="org.mybatis" level="INFO"></logger>
-        <root level="all">
+
+        <!--level设置输出级别-->
+        <root level="error">
             <appender-ref ref="Console"/>
-            <!--<appender-ref ref="RollingFileInfo"/>-->
-            <!--<appender-ref ref="RollingFileWarn"/>-->
-            <!--<appender-ref ref="RollingFileError"/>-->
+            <!--引用RollingFile节点中的name，并将level对应的日志信息输出到对应的文件-->
+            <appender-ref ref="RollingFileInfo"/>
+            <appender-ref ref="RollingFileWarn"/>
+            <appender-ref ref="RollingFileError"/>
         </root>
     </loggers>
 </configuration>
