@@ -53,8 +53,8 @@
         <logger name="org.springframework" level="INFO"></logger>
         <logger name="org.mybatis" level="INFO"></logger>
 
-        <!--level设置输出级别-->
-        <root level="error">
+        <!--level我们配置日志输出级别-->
+        <root level="warn">
             <appender-ref ref="Console"/>
             <!--引用RollingFile节点中的name，并将level对应的日志信息输出到对应的文件-->
             <appender-ref ref="RollingFileInfo"/>
