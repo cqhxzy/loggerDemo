@@ -17,35 +17,39 @@
         <!-- 这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
         <!--${sys:user.home}等价于System.getProperty("user.home")-->
         <RollingFile name="RollingFileInfo" fileName="${sys:user.home}/logs/info.log"
-                     filePattern="${sys:user.home}/logs/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log">
+                     filePattern="${sys:user.home}/logs/info/$${date:yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log">
             <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
-            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Filters> <!--通过ThresholdFilter类过滤掉不需要的日志级别-->
+                <!--将WARN及其以上级别的日志给DENY掉-->
+                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <!--ACCEPT info级别的日志-->
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY" />
+            </Filters>
+
+            <!--输入的日志的格式-->
             <PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] - %l - %m%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
-                <SizeBasedTriggeringPolicy size="100 MB"/>
+                <!--一旦日志文件超过大小后就创建新的日志文件-->
+                <SizeBasedTriggeringPolicy size="10KB"/>
             </Policies>
         </RollingFile>
-        <RollingFile name="RollingFileWarn" fileName="${sys:user.home}/logs/warn.log"
-                     filePattern="${sys:user.home}/logs/$${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log">
-            <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
-            <PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] - %l - %m%n"/>
-            <Policies>
-                <TimeBasedTriggeringPolicy/>
-                <SizeBasedTriggeringPolicy size="100 MB"/>
-            </Policies>
-            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
-            <DefaultRolloverStrategy max="20"/>
-        </RollingFile>
+
         <RollingFile name="RollingFileError" fileName="${sys:user.home}/logs/error.log"
-                     filePattern="${sys:user.home}/logs/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log">
-            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+                     filePattern="${sys:user.home}/logs/error/$${date:yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log"
+        >
+            <Filters>
+                <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL" />
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
             <PatternLayout pattern="[%d{HH:mm:ss:SSS}] [%p] - %l - %m%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
-                <SizeBasedTriggeringPolicy size="100 MB"/>
+                <!--一旦日志文件超过大小后就创建新的日志文件-->
+                <SizeBasedTriggeringPolicy size="10KB"/>
             </Policies>
         </RollingFile>
+
     </appenders>
     <!--然后定义logger，只有定义了logger并引入的appender，appender才会生效-->
     <loggers>
@@ -54,11 +58,10 @@
         <logger name="org.mybatis" level="INFO"></logger>
 
         <!--level我们配置日志输出级别-->
-        <root level="warn">
+        <root level="info">
             <appender-ref ref="Console"/>
             <!--引用RollingFile节点中的name，并将level对应的日志信息输出到对应的文件-->
             <appender-ref ref="RollingFileInfo"/>
-            <appender-ref ref="RollingFileWarn"/>
             <appender-ref ref="RollingFileError"/>
         </root>
     </loggers>

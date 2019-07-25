@@ -11,9 +11,15 @@ public class LoggerDemo {
     private static Logger logger = LoggerFactory.getLogger(LoggerDemo.class);
 
     public static void main(String[] args) {
-        logger.info("info");
-        logger.debug("debug");
-        logger.warn("warn");
-        logger.error("error");
+
+        for (int i = 0; i < 100000; i++) {
+            double ran = Math.random();
+            logger.debug("debug," + ran);
+            logger.info("info," + ran);
+            logger.warn("warn," + ran);
+            logger.error("error," + ran);
+        }
+
+        System.out.println("日志输出完毕");
     }
 }
